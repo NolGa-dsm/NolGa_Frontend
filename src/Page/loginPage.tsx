@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Navigate } from 'react-router-dom'
 import LoginForm from '../components/LoginForm'
 import SignupForm from '../components/SignupForm'
 import { API_BASE_URL } from '../api'
@@ -29,6 +30,9 @@ function LoginPage() {
       })
     return () => controller.abort()
   }, [])
+
+  // 이미 로그인된 상태면 로그인 화면 대신 바로 대시보드로 이동
+  if (localStorage.getItem('accessToken')) return <Navigate to="/dashboard" replace />
 
   const isLogin = mode === 'login'
 
