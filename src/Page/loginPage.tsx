@@ -133,11 +133,10 @@ const styles = `
   background:
     radial-gradient(
       ellipse at 20% 0%,
-      rgba(79, 140, 255, 0.12),
+      rgba(var(--primary-rgb), 0.12),
       transparent 60%
     ),
     var(--bg);
-  border-right: 1px solid var(--border);
 }
 
 .logo {
@@ -169,7 +168,6 @@ const styles = `
   gap: 40px;
   margin-top: 64px;
   padding-top: 40px;
-  border-top: 1px solid var(--border);
   max-width: 440px;
 }
 
@@ -343,13 +341,6 @@ const styles = `
   font-size: 13px;
 }
 
-.divider::before,
-.divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
 
 .help {
   margin: 24px 0 0;
