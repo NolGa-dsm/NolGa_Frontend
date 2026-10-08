@@ -1,4 +1,7 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState } from 'react'
+import LoginForm from '../components/LoginForm'
+import SignupForm from '../components/SignupForm'
+import { API_BASE_URL } from '../api'
 
 type Mode = 'login' | 'signup'
 
@@ -8,14 +11,8 @@ interface Stats {
   repositoryCount: number
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? ''
-
 function LoginPage() {
   const [mode, setMode] = useState<Mode>('login')
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [submitting, setSubmitting] = useState(false)
   const [stats, setStats] = useState<Stats | null>(null)
 
   useEffect(() => {
@@ -31,20 +28,6 @@ function LoginPage() {
       })
     return () => controller.abort()
   }, [])
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (!username.trim() || !password) {
-      setError('아이디와 비밀번호를 입력해주세요.')
-      return
-    }
-    setError('')
-    setSubmitting(true)
-    try {
-    } finally {
-      setSubmitting(false)
-    }
-  }
 
   const isLogin = mode === 'login'
 
@@ -109,48 +92,7 @@ function LoginPage() {
               : '아이디와 비밀번호로 계정을 만드세요'}
           </p>
 
-          <form onSubmit={handleSubmit} noValidate>
-            <label className="field">
-              <span className="field__label">아이디</span>
-              <input
-                className="field__input"
-                type="text"
-                autoComplete="username"
-                placeholder="아이디"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-            </label>
-            <label className="field">
-              <span className="field__label">비밀번호</span>
-              <input
-                className="field__input"
-                type="password"
-                autoComplete={isLogin ? 'current-password' : 'new-password'}
-                placeholder="비밀번호"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </label>
-
-            {error && (
-              <p className="error" role="alert">
-                {error}
-              </p>
-            )}
-
-            <button
-              type="submit"
-              className="btn btn--primary"
-              disabled={submitting}
-            >
-              {isLogin ? '로그인' : '회원가입'}
-            </button>
-          </form>
-
-
-
-          
+          {isLogin ? <LoginForm /> : <SignupForm />}
         </div>
       </section>
     </main>
