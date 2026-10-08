@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { fetchWorks, type Work } from '../works'
+import { useCallback, useEffect, useState } from 'react'
+import { deleteWork, fetchWorks, type Work } from '../works'
 
 export function useWorks() {
   const [works, setWorks] = useState<Work[] | null>(null)
@@ -12,5 +12,10 @@ export function useWorks() {
     return () => controller.abort()
   }, [])
 
-  return works
+  const remove = useCallback(async (id: string) => {
+    await deleteWork(id)
+    setWorks((prev) => prev && prev.filter((w) => w.id !== id))
+  }, [])
+
+  return { works, remove }
 }

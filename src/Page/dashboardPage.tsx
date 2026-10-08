@@ -7,7 +7,7 @@ import { matchesQuery } from '../works'
 const ALL = '전체'
 
 function DashboardPage() {
-  const works = useWorks()
+  const { works, remove } = useWorks()
   const [repo, setRepo] = useState(ALL)
   const [query, setQuery] = useState('')
   const [view, setView] = useState<ViewMode>('list')
@@ -69,7 +69,7 @@ function DashboardPage() {
       {works === null ? (
         <p className="works__empty">불러오는 중...</p>
       ) : (
-        <WorkList works={visible} view={view} />
+        <WorkList works={visible} view={view} onDelete={remove} />
       )}
     </main>
   )
