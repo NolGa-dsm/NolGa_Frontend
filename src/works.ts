@@ -19,21 +19,11 @@ export interface ChangedFile {
   deletions: number
 }
 
-export type SourceType = 'commit' | 'issue' | 'file' | 'note'
-
-// 문서화에 사용된 자료 (깃 커밋 외에 사내 일감, 첨부파일, 직접 입력 내용 등)
-export interface WorkSource {
-  id: string
-  type: SourceType
-  title: string
+// 문서와 연결된 이슈/티켓 (번호만 있고 링크가 없을 수도 있음)
+export interface RelatedIssue {
+  key: string // 예: API-142, #37
+  title?: string
   url?: string
-}
-
-export const SOURCE_LABEL: Record<SourceType, string> = {
-  commit: '커밋',
-  issue: '일감/이슈',
-  file: '첨부파일',
-  note: '직접 입력',
 }
 
 export interface WorkDetail extends Work {
@@ -41,7 +31,7 @@ export interface WorkDetail extends Work {
   request?: string // "이런 작업 했어, 문서화해줘" 자연어 요청 원문
   styleName?: string // 문서 생성 시 적용된 계정/조직 스타일
   changes: ChangedFile[]
-  sources: WorkSource[]
+  issues: RelatedIssue[]
 }
 
 export const STATUS_LABEL: Record<WorkStatus, string> = {
@@ -150,11 +140,9 @@ const SAMPLE_DETAILS: Record<string, Partial<WorkDetail>> = {
       { path: 'src/webhook/dlq.ts', type: 'added', additions: 38, deletions: 0 },
       { path: 'src/webhook/legacyRetry.ts', type: 'deleted', additions: 0, deletions: 51 },
     ],
-    sources: [
-      { id: 's1', type: 'commit', title: 'feat: 웹훅 지수 백오프 재시도 추가' },
-      { id: 's2', type: 'commit', title: 'feat: 실패 이벤트 DLQ 전송' },
-      { id: 's3', type: 'issue', title: 'API-142 웹훅 실패 시 이벤트 유실 문제' },
-      { id: 's4', type: 'file', title: '재시도정책_논의.pdf' },
+    issues: [
+      { key: 'API-142', title: '웹훅 실패 시 이벤트 유실 문제', url: 'https://tracker.example.com/API-142' },
+      { key: 'API-150' },
     ],
   },
 }
@@ -173,7 +161,7 @@ export async function fetchWork(id: string, signal?: AbortSignal): Promise<WorkD
     if (err instanceof DOMException && err.name === 'AbortError') throw err
     const base = SAMPLE_WORKS.find((w) => w.id === id)
     if (!base) return null
-    return { ...base, changes: [], sources: [], ...SAMPLE_DETAILS[id] }
+    return { ...base, changes: [], issues: [], ...SAMPLE_DETAILS[id] }
   }
 }
 
