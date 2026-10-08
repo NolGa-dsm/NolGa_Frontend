@@ -123,6 +123,22 @@ export async function fetchWorks(signal?: AbortSignal): Promise<Work[]> {
   }
 }
 
+// TODO: 백엔드 응답 스펙에 맞게 엔드포인트/필드명 조정 (내가 작성한 작업만 반환)
+export async function fetchMyWorks(signal?: AbortSignal): Promise<Work[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/works/me`, {
+      signal,
+      headers: { Authorization: `Bearer ${localStorage.getItem('accessToken') ?? ''}` },
+    })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    return (await res.json()) as Work[]
+  } catch (err) {
+    if (err instanceof DOMException && err.name === 'AbortError') throw err
+    const username = localStorage.getItem('username')
+    return SAMPLE_WORKS.filter((w) => w.author === username)
+  }
+}
+
 // TODO: 백엔드 연동 후 제거 (API 실패 시 화면 확인용 샘플)
 const SAMPLE_DETAILS: Record<string, Partial<WorkDetail>> = {
   '1': {
