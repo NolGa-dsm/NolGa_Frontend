@@ -1,7 +1,9 @@
 import { useState, type FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { API_BASE_URL } from '../api'
 
 function LoginForm() {
+  const navigate = useNavigate()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -28,7 +30,8 @@ function LoginForm() {
       }
       const { accessToken } = (await res.json()) as { accessToken: string }
       localStorage.setItem('accessToken', accessToken)
-      // TODO: 로그인 후 대시보드로 이동
+      localStorage.setItem('username', username.trim())
+      navigate('/dashboard')
     } catch (err) {
       setError(
         err instanceof Error ? err.message : '요청 중 오류가 발생했습니다.',
