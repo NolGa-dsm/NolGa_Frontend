@@ -13,6 +13,7 @@ interface Stats {
 
 function LoginPage() {
   const [mode, setMode] = useState<Mode>('login')
+  const [notice, setNotice] = useState('')
   const [stats, setStats] = useState<Stats | null>(null)
 
   useEffect(() => {
@@ -68,7 +69,10 @@ function LoginPage() {
               role="tab"
               className="tab"
               aria-selected={isLogin}
-              onClick={() => setMode('login')}
+              onClick={() => {
+                setNotice('')
+                setMode('login')
+              }}
             >
               로그인
             </button>
@@ -92,7 +96,21 @@ function LoginPage() {
               : '아이디와 비밀번호로 계정을 만드세요'}
           </p>
 
-          {isLogin ? <LoginForm /> : <SignupForm />}
+          {notice && isLogin && (
+            <p className="notice" role="status">
+              {notice}
+            </p>
+          )}
+          {isLogin ? (
+            <LoginForm />
+          ) : (
+            <SignupForm
+              onSuccess={() => {
+                setNotice('회원가입이 완료되었습니다. 로그인해주세요.')
+                setMode('login')
+              }}
+            />
+          )}
         </div>
       </section>
     </main>
@@ -266,6 +284,12 @@ const styles = `
   margin: -4px 0 16px;
   font-size: 13px;
   color: var(--error);
+}
+
+.notice {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: var(--primary);
 }
 
 .btn {
