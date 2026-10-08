@@ -3,7 +3,6 @@ import { NavLink, useNavigate } from 'react-router-dom'
 const MENU = [
   { to: '/dashboard', label: '전체 문서' },
   { to: '/my-works', label: '내 작업' },
-  { to: '/repositories', label: '저장소' },
   { to: '/settings', label: '설정' },
 ]
 
@@ -52,7 +51,6 @@ const styles = `
   flex-shrink: 0;
   padding: 24px 16px;
   background: var(--surface);
-  border-right: 1px solid var(--border);
 }
 .sidebar__logo {
   padding: 0 12px;
@@ -79,7 +77,6 @@ const styles = `
   align-items: center;
   gap: 10px;
   padding: 16px 12px 0;
-  border-top: 1px solid var(--border);
 }
 .sidebar__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 500; }
 .sidebar__logout {
