@@ -1,6 +1,11 @@
 import { useState, type FormEvent } from 'react'
+import { API_BASE_URL } from '../api'
 
-function SignupForm() {
+interface SignupFormProps {
+  onSuccess: () => void
+}
+
+function SignupForm({ onSuccess }: SignupFormProps) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -15,7 +20,21 @@ function SignupForm() {
     setError('')
     setSubmitting(true)
     try {
-      // TODO: 회원가입 API 연동
+      // TODO: 백엔드 스펙에 맞게 엔드포인트/필드명 조정
+      const res = await fetch(`${API_BASE_URL}/api/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username.trim(), password }),
+      })
+      if (!res.ok) {
+        const body = await res.json().catch(() => null)
+        throw new Error(body?.message ?? '회원가입에 실패했습니다.')
+      }
+      onSuccess()
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : '요청 중 오류가 발생했습니다.',
+      )
     } finally {
       setSubmitting(false)
     }
