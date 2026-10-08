@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { useWork } from '../hooks/useWork'
 import { SOURCE_LABEL, STATUS_LABEL, type ChangedFile, type SourceType, type WorkSource } from '../works'
 import { workListStyles } from '../components/WorkList'
@@ -16,7 +16,14 @@ const SOURCE_ORDER: SourceType[] = ['commit', 'issue', 'file', 'note']
 function WorkDetailPage() {
   const { id } = useParams()
   const { work, saveSummary } = useWork(id)
-  const [draft, setDraft] = useState<string | null>(null)
+  const [searchParams] = useSearchParams()
+  const [localDraft, setLocalDraft] = useState<string | null>(null)
+  const [editRequested, setEditRequested] = useState(searchParams.has('edit')) // 목록의 ⋮ 메뉴에서 진입
+  const draft = localDraft ?? (editRequested && work ? work.summary : null)
+  const setDraft = (value: string | null) => {
+    setLocalDraft(value)
+    setEditRequested(false)
+  }
 
   const sourcesByType = (sources: WorkSource[]) =>
     SOURCE_ORDER.map((type) => ({ type, items: sources.filter((x) => x.type === type) })).filter(
