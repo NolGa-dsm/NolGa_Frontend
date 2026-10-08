@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { STATUS_LABEL, type Work } from '../works'
 
 export type ViewMode = 'list' | 'card'
@@ -15,7 +16,7 @@ function WorkList({ works, view }: Props) {
     <ul className={`works works--${view}`}>
       {works.map((w) => (
         <li key={w.id}>
-          <div className="work">
+          <Link className="work" to={`/works/${w.id}`}>
             <div className="work__main">
               <div className="work__head">
                 <h3 className="work__title">{w.title}</h3>
@@ -33,7 +34,7 @@ function WorkList({ works, view }: Props) {
               </span>
               <time className="work__date">{w.createdAt}</time>
             </div>
-          </div>
+          </Link>
         </li>
       ))}
     </ul>
@@ -51,6 +52,8 @@ export const workListStyles = `
 
 .work {
   display: flex;
+  color: inherit;
+  text-decoration: none;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
@@ -73,6 +76,7 @@ export const workListStyles = `
 .work__author { display: flex; align-items: center; gap: 8px; min-width: 130px; }
 .work__date { color: var(--text-faint); font-variant-numeric: tabular-nums; }
 
+.work:hover { background: var(--surface); }
 .works--card .work {
   flex-direction: column;
   align-items: stretch;

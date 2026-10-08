@@ -12,6 +12,38 @@ export interface Work {
   status: WorkStatus
 }
 
+export interface ChangedFile {
+  path: string
+  type: 'added' | 'modified' | 'deleted'
+  additions: number
+  deletions: number
+}
+
+export type SourceType = 'commit' | 'issue' | 'file' | 'note'
+
+// 문서화에 사용된 자료 (깃 커밋 외에 사내 일감, 첨부파일, 직접 입력 내용 등)
+export interface WorkSource {
+  id: string
+  type: SourceType
+  title: string
+  url?: string
+}
+
+export const SOURCE_LABEL: Record<SourceType, string> = {
+  commit: '커밋',
+  issue: '일감/이슈',
+  file: '첨부파일',
+  note: '직접 입력',
+}
+
+export interface WorkDetail extends Work {
+  branch?: string // 한 브랜치 = 한 사람의 한 작업 단위
+  request?: string // "이런 작업 했어, 문서화해줘" 자연어 요청 원문
+  styleName?: string // 문서 생성 시 적용된 계정/조직 스타일
+  changes: ChangedFile[]
+  sources: WorkSource[]
+}
+
 export const STATUS_LABEL: Record<WorkStatus, string> = {
   auto: '자동 생성',
   review: '검토 대기',
@@ -88,6 +120,60 @@ export async function fetchWorks(signal?: AbortSignal): Promise<Work[]> {
   } catch (err) {
     if (err instanceof DOMException && err.name === 'AbortError') throw err
     return SAMPLE_WORKS
+  }
+}
+
+// TODO: 백엔드 연동 후 제거 (API 실패 시 화면 확인용 샘플)
+const SAMPLE_DETAILS: Record<string, Partial<WorkDetail>> = {
+  '1': {
+    branch: 'feature/webhook-retry',
+    request: '결제 웹훅 재시도 로직 바꾼 거 문서화해줘. 일감 API-142 참고해줘.',
+    styleName: '팀 기본 스타일',
+    changes: [
+      { path: 'src/webhook/retry.ts', type: 'modified', additions: 64, deletions: 12 },
+      { path: 'src/webhook/dlq.ts', type: 'added', additions: 38, deletions: 0 },
+      { path: 'src/webhook/legacyRetry.ts', type: 'deleted', additions: 0, deletions: 51 },
+    ],
+    sources: [
+      { id: 's1', type: 'commit', title: 'feat: 웹훅 지수 백오프 재시도 추가' },
+      { id: 's2', type: 'commit', title: 'feat: 실패 이벤트 DLQ 전송' },
+      { id: 's3', type: 'issue', title: 'API-142 웹훅 실패 시 이벤트 유실 문제' },
+      { id: 's4', type: 'file', title: '재시도정책_논의.pdf' },
+    ],
+  },
+}
+
+// TODO: 백엔드 응답 스펙에 맞게 엔드포인트/필드명 조정
+export async function fetchWork(id: string, signal?: AbortSignal): Promise<WorkDetail | null> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/works/${encodeURIComponent(id)}`, {
+      signal,
+      headers: { Authorization: `Bearer ${localStorage.getItem('accessToken') ?? ''}` },
+    })
+    if (res.status === 404) return null
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    return (await res.json()) as WorkDetail
+  } catch (err) {
+    if (err instanceof DOMException && err.name === 'AbortError') throw err
+    const base = SAMPLE_WORKS.find((w) => w.id === id)
+    if (!base) return null
+    return { ...base, changes: [], sources: [], ...SAMPLE_DETAILS[id] }
+  }
+}
+
+// TODO: 백엔드 응답 스펙에 맞게 엔드포인트/필드명 조정 (실패해도 화면에는 수정 반영)
+export async function updateWorkSummary(id: string, summary: string): Promise<void> {
+  try {
+    await fetch(`${API_BASE_URL}/api/works/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('accessToken') ?? ''}`,
+      },
+      body: JSON.stringify({ summary }),
+    })
+  } catch {
+    // 연동 전에는 무시
   }
 }
 
