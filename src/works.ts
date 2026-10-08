@@ -193,6 +193,18 @@ export async function updateWorkSummary(id: string, summary: string): Promise<vo
   }
 }
 
+// TODO: 백엔드 응답 스펙에 맞게 엔드포인트 조정 (실패해도 화면에서는 제거)
+export async function deleteWork(id: string): Promise<void> {
+  try {
+    await fetch(`${API_BASE_URL}/api/works/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${localStorage.getItem('accessToken') ?? ''}` },
+    })
+  } catch {
+    // 연동 전에는 무시
+  }
+}
+
 export function matchesQuery(work: Work, query: string): boolean {
   const q = query.trim().toLowerCase()
   if (!q) return true

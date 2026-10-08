@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import WorkMenu, { workMenuStyles } from './WorkMenu'
 import { STATUS_LABEL, type Work } from '../works'
 
 export type ViewMode = 'list' | 'card'
@@ -6,16 +7,17 @@ export type ViewMode = 'list' | 'card'
 interface Props {
   works: Work[]
   view: ViewMode
+  onDelete?: (id: string) => void | Promise<void> // 지정하면 각 항목에 ⋮ 메뉴(수정/삭제)가 표시됨
 }
 
-function WorkList({ works, view }: Props) {
+function WorkList({ works, view, onDelete }: Props) {
   if (works.length === 0) {
     return <p className="works__empty">표시할 작업이 없습니다.</p>
   }
   return (
     <ul className={`works works--${view}`}>
       {works.map((w) => (
-        <li key={w.id}>
+        <li key={w.id} className={onDelete ? 'works__item works__item--menu' : 'works__item'}>
           <Link className="work" to={`/works/${w.id}`}>
             <div className="work__main">
               <div className="work__head">
@@ -35,19 +37,23 @@ function WorkList({ works, view }: Props) {
               <time className="work__date">{w.createdAt}</time>
             </div>
           </Link>
+          {onDelete && <WorkMenu work={w} onDelete={onDelete} />}
         </li>
       ))}
     </ul>
   )
 }
 
-export const workListStyles = `
+export const workListStyles = workMenuStyles + `
 .works { list-style: none; margin: 0; padding: 0; }
 .works--card {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 16px;
 }
+.works__item { position: relative; }
+.works__item:has(.wmenu__btn[aria-expanded='true']) { z-index: 20; }
+.works__item--menu .work { padding-right: 56px; }
 .works__empty { padding: 64px 0; text-align: center; color: var(--text-faint); }
 
 .work {
