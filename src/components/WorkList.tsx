@@ -130,7 +130,7 @@ export const workListStyles = workMenuStyles + `
   font-weight: 500;
   white-space: nowrap;
 }
-.badge--auto { color: var(--primary); border-color: rgba(79, 140, 255, 0.4); background: rgba(79, 140, 255, 0.1); }
+.badge--auto { color: var(--primary); border-color: rgba(var(--primary-rgb), 0.4); background: rgba(var(--primary-rgb), 0.1); }
 .badge--review { color: var(--text-muted); }
 .badge--edited { color: #f0b429; border-color: rgba(240, 180, 41, 0.4); background: rgba(240, 180, 41, 0.1); }
 

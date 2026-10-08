@@ -98,8 +98,8 @@ const styles = pageStyles + `
 .filter:hover { color: var(--text); background: var(--surface-2); }
 .filter[aria-pressed='true'] {
   color: var(--primary);
-  border-color: rgba(79, 140, 255, 0.5);
-  background: rgba(79, 140, 255, 0.1);
+  border-color: rgba(var(--primary-rgb), 0.5);
+  background: rgba(var(--primary-rgb), 0.1);
 }
 .viewtoggle {
   display: flex;

@@ -39,7 +39,7 @@ function RepositorySection() {
 
   return (
     <section className="card" aria-labelledby="s-repo">
-      <h2 id="s-repo" className="card__title">저장소 연동</h2>
+      <h2 id="s-repo" className="card__title">저장소 연동 상태</h2>
       {error && <p className="msg msg--error" role="alert">{error}</p>}
       {repos === null ? (
         <p className="muted">불러오는 중...</p>
@@ -105,7 +105,7 @@ function IlgamSection() {
   return (
     <section className="card" aria-labelledby="s-ilgam">
       <h2 id="s-ilgam" className="card__title">
-        일감 사이트 연동
+        일감 사이트 연동 상태
         <span className={`badge ${info?.connected ? 'badge--ok' : ''}`}>
           {info?.connected ? '연동됨' : '연동 안 됨'}
         </span>
@@ -384,7 +384,7 @@ const styles = pageStyles + `
   cursor: pointer;
   transition: background 0.15s;
 }
-.switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform 0.15s; }
+.switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--text); transition: transform 0.15s; }
 .switch[aria-checked='true'] { background: var(--primary); }
 .switch[aria-checked='true']::after { transform: translateX(18px); }
 `
