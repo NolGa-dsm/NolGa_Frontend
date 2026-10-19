@@ -14,6 +14,7 @@ import {
   type NotificationSettings,
   type TrackedRepository,
 } from '../settings'
+import ThemeSwitch from '../components/ThemeSwitch'
 import { pageStyles } from './dashboardPage'
 
 const errorMessage = (err: unknown) => (err instanceof Error ? err.message : '요청 중 오류가 발생했습니다.')
@@ -305,13 +306,26 @@ function NotificationSection() {
   )
 }
 
+function AppearanceSection() {
+  return (
+    <section className="card" aria-labelledby="s-theme">
+      <h2 id="s-theme" className="card__title">화면</h2>
+      <p className="card__desc">밝은 화면과 어두운 화면 중 편한 쪽을 선택하세요.</p>
+      <div className="list__item">
+        <span>다크 모드</span>
+        <ThemeSwitch />
+      </div>
+    </section>
+  )
+}
+
 function SettingsPage() {
   return (
     <main className="page page--narrow">
       <style>{styles}</style>
       <div className="page__head">
         <h1 className="page__title">설정</h1>
-        <p className="page__subtitle">저장소, 연동, 계정, 알림을 관리합니다</p>
+        <p className="page__subtitle">저장소, 연동, 계정, 알림, 화면을 관리합니다</p>
       </div>
       <div className="settings">
         <RepositorySection />
@@ -319,6 +333,7 @@ function SettingsPage() {
         <McpSection />
         <AccountSection />
         <NotificationSection />
+        <AppearanceSection />
       </div>
     </main>
   )
@@ -366,12 +381,12 @@ const styles = pageStyles + `
 .muted { color: var(--text-faint); font-size: 13px; }
 .msg { margin: 12px 0 0; font-size: 13px; }
 .msg--error { color: var(--error); }
-.msg--ok { color: #4ade80; }
+.msg--ok { color: var(--success); }
 .badge { padding: 2px 8px; border-radius: 999px; background: var(--surface-2); color: var(--text-muted); font-size: 12px; font-weight: 500; }
-.badge--ok { background: rgba(74, 222, 128, 0.12); color: #4ade80; }
-.badge--err { background: rgba(255, 107, 107, 0.12); color: var(--error); }
+.badge--ok { background: rgba(var(--success-rgb), 0.14); color: var(--success); }
+.badge--err { background: rgba(var(--error-rgb), 0.14); color: var(--error); }
 .dot { display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; }
-.dot--ok { background: #4ade80; }
+.dot--ok { background: var(--success); }
 .dot--err { background: var(--error); }
 .switch {
   position: relative;

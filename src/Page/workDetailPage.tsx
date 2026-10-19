@@ -163,10 +163,10 @@ const styles = `
 .change:last-child, .issue:last-child { border-bottom: 0; }
 .change__path { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .change__type { padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border); font-size: 12px; }
-.change__type--added { color: #3ecf8e; border-color: rgba(62, 207, 142, 0.4); background: rgba(62, 207, 142, 0.1); }
-.change__type--modified { color: #f0b429; border-color: rgba(240, 180, 41, 0.4); background: rgba(240, 180, 41, 0.1); }
-.change__type--deleted { color: var(--error); border-color: rgba(255, 107, 107, 0.4); background: rgba(255, 107, 107, 0.1); }
-.change__add { color: #3ecf8e; font-variant-numeric: tabular-nums; }
+.change__type--added { color: var(--success); border-color: rgba(var(--success-rgb), 0.4); background: rgba(var(--success-rgb), 0.12); }
+.change__type--modified { color: var(--warning); border-color: rgba(var(--warning-rgb), 0.4); background: rgba(var(--warning-rgb), 0.12); }
+.change__type--deleted { color: var(--error); border-color: rgba(var(--error-rgb), 0.4); background: rgba(var(--error-rgb), 0.12); }
+.change__add { color: var(--success); font-variant-numeric: tabular-nums; }
 .change__del { color: var(--error); font-variant-numeric: tabular-nums; }
 .issue a { display: flex; gap: 12px; color: var(--primary); text-decoration: none; }
 .issue a:hover .issue__title { text-decoration: underline; }
