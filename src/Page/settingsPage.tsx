@@ -14,6 +14,7 @@ import {
   type NotificationSettings,
   type TrackedRepository,
 } from '../settings'
+import ThemeSwitch from '../components/ThemeSwitch'
 import { pageStyles } from './dashboardPage'
 
 const errorMessage = (err: unknown) => (err instanceof Error ? err.message : '요청 중 오류가 발생했습니다.')
@@ -305,13 +306,26 @@ function NotificationSection() {
   )
 }
 
+function AppearanceSection() {
+  return (
+    <section className="card" aria-labelledby="s-theme">
+      <h2 id="s-theme" className="card__title">화면</h2>
+      <p className="card__desc">밝은 화면과 어두운 화면 중 편한 쪽을 선택하세요.</p>
+      <div className="list__item">
+        <span>다크 모드</span>
+        <ThemeSwitch />
+      </div>
+    </section>
+  )
+}
+
 function SettingsPage() {
   return (
     <main className="page page--narrow">
       <style>{styles}</style>
       <div className="page__head">
         <h1 className="page__title">설정</h1>
-        <p className="page__subtitle">저장소, 연동, 계정, 알림을 관리합니다</p>
+        <p className="page__subtitle">저장소, 연동, 계정, 알림, 화면을 관리합니다</p>
       </div>
       <div className="settings">
         <RepositorySection />
@@ -319,6 +333,7 @@ function SettingsPage() {
         <McpSection />
         <AccountSection />
         <NotificationSection />
+        <AppearanceSection />
       </div>
     </main>
   )
