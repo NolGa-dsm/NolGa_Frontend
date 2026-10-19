@@ -7,12 +7,13 @@ export type ViewMode = 'list' | 'card'
 interface Props {
   works: Work[]
   view: ViewMode
+  emptyMessage?: string
   onDelete?: (id: string) => void | Promise<void> // 지정하면 각 항목에 ⋮ 메뉴(수정/삭제)가 표시됨
 }
 
-function WorkList({ works, view, onDelete }: Props) {
+function WorkList({ works, view, onDelete, emptyMessage = '표시할 작업이 없습니다.' }: Props) {
   if (works.length === 0) {
-    return <p className="works__empty">표시할 작업이 없습니다.</p>
+    return <p className="works__empty">{emptyMessage}</p>
   }
   return (
     <ul className={`works works--${view}`}>
@@ -117,8 +118,8 @@ export const workListStyles = workMenuStyles + `
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: var(--surface-2);
-  color: var(--text-muted);
+  background: var(--accent);
+  color: var(--accent-ink);
   font-size: 11px;
   font-weight: 600;
 }
@@ -132,7 +133,7 @@ export const workListStyles = workMenuStyles + `
 }
 .badge--auto { color: var(--primary); border-color: rgba(var(--primary-rgb), 0.4); background: rgba(var(--primary-rgb), 0.1); }
 .badge--review { color: var(--text-muted); }
-.badge--edited { color: #f0b429; border-color: rgba(240, 180, 41, 0.4); background: rgba(240, 180, 41, 0.1); }
+.badge--edited { color: var(--warning); border-color: rgba(var(--warning-rgb), 0.4); background: rgba(var(--warning-rgb), 0.12); }
 
 @media (max-width: 860px) {
   .work { flex-direction: column; align-items: stretch; gap: 12px; }

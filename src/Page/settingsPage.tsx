@@ -366,12 +366,12 @@ const styles = pageStyles + `
 .muted { color: var(--text-faint); font-size: 13px; }
 .msg { margin: 12px 0 0; font-size: 13px; }
 .msg--error { color: var(--error); }
-.msg--ok { color: #4ade80; }
+.msg--ok { color: var(--success); }
 .badge { padding: 2px 8px; border-radius: 999px; background: var(--surface-2); color: var(--text-muted); font-size: 12px; font-weight: 500; }
-.badge--ok { background: rgba(74, 222, 128, 0.12); color: #4ade80; }
-.badge--err { background: rgba(255, 107, 107, 0.12); color: var(--error); }
+.badge--ok { background: rgba(var(--success-rgb), 0.14); color: var(--success); }
+.badge--err { background: rgba(var(--error-rgb), 0.14); color: var(--error); }
 .dot { display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; }
-.dot--ok { background: #4ade80; }
+.dot--ok { background: var(--success); }
 .dot--err { background: var(--error); }
 .switch {
   position: relative;

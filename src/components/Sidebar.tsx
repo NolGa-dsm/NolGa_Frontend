@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
+import { getTheme, setTheme, type Theme } from '../theme'
 
 const MENU = [
   { to: '/dashboard', label: '전체 문서' },
@@ -8,12 +10,19 @@ const MENU = [
 
 function Sidebar() {
   const navigate = useNavigate()
+  const [theme, setThemeState] = useState<Theme>(getTheme)
   const username = localStorage.getItem('username') ?? '사용자'
 
   const logout = () => {
     localStorage.removeItem('accessToken')
     localStorage.removeItem('username')
     navigate('/login')
+  }
+
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark'
+    setTheme(next)
+    setThemeState(next)
   }
 
   return (
@@ -28,6 +37,10 @@ function Sidebar() {
           </NavLink>
         ))}
       </nav>
+
+      <button type="button" className="sidebar__theme" onClick={toggleTheme}>
+        {theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
+      </button>
 
       <div className="sidebar__profile">
         <span className="avatar">{username.slice(0, 2).toUpperCase()}</span>
@@ -72,6 +85,19 @@ const styles = `
 .sidebar__link:hover { color: var(--text); }
 .sidebar__link.active { background: var(--surface-2); color: var(--text); }
 .sidebar__link:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.sidebar__theme {
+  margin: 0 0 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.sidebar__theme:hover { color: var(--text); background: var(--surface-2); }
+.sidebar__theme:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .sidebar__profile {
   display: flex;
   align-items: center;
