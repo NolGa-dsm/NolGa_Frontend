@@ -1,4 +1,4 @@
-import { API_BASE_URL } from './api'
+import { authFetch, getUsername, isAbortError } from './api'
 
 export type WorkStatus = 'auto' | 'review' | 'edited'
 
@@ -101,14 +101,11 @@ const SAMPLE_WORKS: Work[] = [
 // TODO: 백엔드 응답 스펙에 맞게 엔드포인트/필드명 조정
 export async function fetchWorks(signal?: AbortSignal): Promise<Work[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/works`, {
-      signal,
-      headers: { Authorization: `Bearer ${localStorage.getItem('accessToken') ?? ''}` },
-    })
+    const res = await authFetch('/api/works', { signal })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     return (await res.json()) as Work[]
   } catch (err) {
-    if (err instanceof DOMException && err.name === 'AbortError') throw err
+    if (isAbortError(err)) throw err
     return SAMPLE_WORKS
   }
 }
@@ -116,15 +113,12 @@ export async function fetchWorks(signal?: AbortSignal): Promise<Work[]> {
 // TODO: 백엔드 응답 스펙에 맞게 엔드포인트/필드명 조정 (내가 작성한 작업만 반환)
 export async function fetchMyWorks(signal?: AbortSignal): Promise<Work[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/works/me`, {
-      signal,
-      headers: { Authorization: `Bearer ${localStorage.getItem('accessToken') ?? ''}` },
-    })
+    const res = await authFetch('/api/works/me', { signal })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     return (await res.json()) as Work[]
   } catch (err) {
-    if (err instanceof DOMException && err.name === 'AbortError') throw err
-    const username = localStorage.getItem('username')
+    if (isAbortError(err)) throw err
+    const username = getUsername()
     return SAMPLE_WORKS.filter((w) => w.author === username)
   }
 }
@@ -150,15 +144,12 @@ const SAMPLE_DETAILS: Record<string, Partial<WorkDetail>> = {
 // TODO: 백엔드 응답 스펙에 맞게 엔드포인트/필드명 조정
 export async function fetchWork(id: string, signal?: AbortSignal): Promise<WorkDetail | null> {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/works/${encodeURIComponent(id)}`, {
-      signal,
-      headers: { Authorization: `Bearer ${localStorage.getItem('accessToken') ?? ''}` },
-    })
+    const res = await authFetch(`/api/works/${encodeURIComponent(id)}`, { signal })
     if (res.status === 404) return null
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     return (await res.json()) as WorkDetail
   } catch (err) {
-    if (err instanceof DOMException && err.name === 'AbortError') throw err
+    if (isAbortError(err)) throw err
     const base = SAMPLE_WORKS.find((w) => w.id === id)
     if (!base) return null
     return { ...base, changes: [], issues: [], ...SAMPLE_DETAILS[id] }
@@ -168,12 +159,9 @@ export async function fetchWork(id: string, signal?: AbortSignal): Promise<WorkD
 // TODO: 백엔드 응답 스펙에 맞게 엔드포인트/필드명 조정 (실패해도 화면에는 수정 반영)
 export async function updateWorkSummary(id: string, summary: string): Promise<void> {
   try {
-    await fetch(`${API_BASE_URL}/api/works/${encodeURIComponent(id)}`, {
+    await authFetch(`/api/works/${encodeURIComponent(id)}`, {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('accessToken') ?? ''}`,
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ summary }),
     })
   } catch {
@@ -184,10 +172,7 @@ export async function updateWorkSummary(id: string, summary: string): Promise<vo
 // TODO: 백엔드 응답 스펙에 맞게 엔드포인트 조정 (실패해도 화면에서는 제거)
 export async function deleteWork(id: string): Promise<void> {
   try {
-    await fetch(`${API_BASE_URL}/api/works/${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${localStorage.getItem('accessToken') ?? ''}` },
-    })
+    await authFetch(`/api/works/${encodeURIComponent(id)}`, { method: 'DELETE' })
   } catch {
     // 연동 전에는 무시
   }

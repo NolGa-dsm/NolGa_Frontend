@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import AppLayout from './components/AppLayout'
+import { isLoggedIn } from './api'
+import AppLayout from './components/layout/AppLayout'
 import DashboardPage from './Page/dashboardPage'
 import WorkDetailPage from './Page/workDetailPage'
 import MyWorksPage from './Page/myWorksPage'
@@ -7,7 +8,7 @@ import SettingsPage from './Page/settingsPage'
 import LoginPage from './Page/loginPage'
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
-  return localStorage.getItem('accessToken') ? (
+  return isLoggedIn() ? (
     children
   ) : (
     <Navigate to="/login" replace />

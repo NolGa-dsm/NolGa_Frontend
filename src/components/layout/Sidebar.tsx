@@ -1,4 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
+import { clearSession, getUsername } from '../../api'
 
 const MENU = [
   { to: '/dashboard', label: '전체 문서' },
@@ -8,11 +9,10 @@ const MENU = [
 
 function Sidebar() {
   const navigate = useNavigate()
-  const username = localStorage.getItem('username') ?? '사용자'
+  const username = getUsername() ?? '사용자'
 
   const logout = () => {
-    localStorage.removeItem('accessToken')
-    localStorage.removeItem('username')
+    clearSession()
     navigate('/login')
   }
 
