@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { API_BASE_URL } from '../api'
+import { API_BASE_URL, saveSession } from '../api'
 
 function LoginForm() {
   const navigate = useNavigate()
@@ -29,8 +29,7 @@ function LoginForm() {
         throw new Error(body?.message ?? '아이디 또는 비밀번호가 올바르지 않습니다.')
       }
       const { accessToken } = (await res.json()) as { accessToken: string }
-      localStorage.setItem('accessToken', accessToken)
-      localStorage.setItem('username', username.trim())
+      saveSession(accessToken, username.trim())
       navigate('/dashboard')
     } catch (err) {
       setError(

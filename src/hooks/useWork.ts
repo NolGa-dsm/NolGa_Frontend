@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { fetchWork, updateWorkSummary, type WorkDetail } from '../works'
 
-// work - undefined: 로딩 중, null: 존재하지 않는 작업
 export function useWork(id: string | undefined) {
   const [state, setState] = useState<{ id?: string; work: WorkDetail | null }>()
 

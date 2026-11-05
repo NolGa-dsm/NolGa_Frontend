@@ -1,4 +1,4 @@
-import { API_BASE_URL } from './api'
+import { authFetch, isAbortError } from './api'
 
 export interface TrackedRepository {
   id: string
@@ -30,13 +30,9 @@ export interface IlgamSettings {
 
 async function request<T>(path: string, init: RequestInit = {}, fallback?: T): Promise<T> {
   try {
-    const res = await fetch(`${API_BASE_URL}${path}`, {
+    const res = await authFetch(path, {
       ...init,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('accessToken') ?? ''}`,
-        ...init.headers,
-      },
+      headers: { 'Content-Type': 'application/json', ...init.headers },
     })
     if (!res.ok) {
       const body = await res.json().catch(() => null)
@@ -44,7 +40,7 @@ async function request<T>(path: string, init: RequestInit = {}, fallback?: T): P
     }
     return (res.status === 204 ? undefined : await res.json()) as T
   } catch (err) {
-    if (err instanceof DOMException && err.name === 'AbortError') throw err
+    if (isAbortError(err)) throw err
     if (fallback !== undefined) return fallback
     throw err
   }
