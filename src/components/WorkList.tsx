@@ -88,9 +88,14 @@ export const workListStyles = workMenuStyles + `
   font-size: 14px;
   line-height: 1.6;
   max-width: 72ch;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.work__meta { display: flex; align-items: center; gap: 20px; margin-top: 12px; font-size: 14px; }
-.work__author { display: flex; align-items: center; gap: 8px; }
+.work__meta { display: flex; align-items: center; gap: 20px; min-width: 0; margin-top: 12px; font-size: 14px; }
+.work__author { display: flex; align-items: center; gap: 8px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .work__date { margin-left: auto; color: var(--text-faint); font-variant-numeric: tabular-nums; }
 .work__date--head { display: none; }
 
@@ -152,75 +157,11 @@ export const workListStyles = workMenuStyles + `
   .work, .work__more, .work__date--head { transition: none !important; }
 }
 
-.chip { display: inline-block; }
-.works--list .works__item:hover .work__author,
-.works--list .works__item:focus-within .work__author { display: flex; }
-.works--list .works__item:hover .work__date,
-.works--list .works__item:focus-within .work__date { margin-left: auto; }
-
-/* 호버가 없는 터치 기기에서는 항상 펼쳐서 보여줌 */
-@media (hover: none) {
-  .works--list .work__summary { display: block; white-space: normal; }
-  .works--list .work__meta .chip { display: inline-block; }
-  .works--list .work__author { display: flex; }
-}
-
-.chip { display: inline-block; }
-.works--list .works__item--open .work__author { display: flex; }
-.works--list .work { padding-top: 16px; padding-bottom: 16px; }
-/* ⋮ 메뉴는 호버로 행이 늘어나도 제목 줄 높이에 고정 */
-.works--list .wmenu { top: 13px; margin-top: 0; }
-.works--list .works__item--open .work { flex-direction: column; align-items: stretch; gap: 12px; padding-top: 20px; padding-bottom: 22px; }
-.works--list .works__item--open .work__date { margin-left: auto; }
-.works__empty { padding: 64px 0; text-align: center; color: var(--text-faint); }
-
-.work {
-  display: flex;
-  color: inherit;
-  text-decoration: none;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 22px 8px;
-  border-bottom: 1px solid var(--border);
-  transition: background 0.15s;
-}
-.work__main { min-width: 0; flex: 1; }
-.work__head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-.work__title { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
-.work__summary {
-  margin: 0;
-  color: var(--text-muted);
-  font-size: 14px;
+.chip {
+  max-width: 240px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-.work__meta { display: flex; align-items: center; gap: 20px; flex-shrink: 0; font-size: 14px; }
-.work__author { display: flex; align-items: center; gap: 8px; min-width: 130px; }
-.work__date { color: var(--text-faint); font-variant-numeric: tabular-nums; }
-
-.work:hover { background: var(--surface); }
-.works--card .work {
-  flex-direction: column;
-  align-items: stretch;
-  height: 100%;
-  padding: 20px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-}
-.works--card .work__summary {
-  white-space: normal;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-}
-.works--card .work__meta { flex-wrap: wrap; gap: 12px; }
-.works--card .work__author { min-width: 0; }
-.works--card .work__date { margin-left: auto; }
-
-.chip {
   padding: 5px 10px;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -252,12 +193,6 @@ export const workListStyles = workMenuStyles + `
 .badge--review { color: var(--text-muted); }
 .badge--edited { color: var(--warning); border-color: rgba(var(--warning-rgb), 0.4); background: rgba(var(--warning-rgb), 0.12); }
 
-@media (max-width: 860px) {
-  .work { flex-direction: column; align-items: stretch; gap: 12px; }
-  .work__summary { white-space: normal; }
-  .work__meta { flex-wrap: wrap; gap: 12px; }
-  .work__author { min-width: 0; }
-}
 `
 
 export default WorkList
