@@ -202,33 +202,6 @@ export const loginStyles = `
   cursor: not-allowed;
 }
 
-.btn--outline {
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text);
-}
-
-.btn--outline:hover {
-  border-color: var(--text-faint);
-  background: var(--surface-2);
-}
-
-.divider {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin: 28px 0;
-  color: var(--text-faint);
-  font-size: 13px;
-}
-
-
-.help {
-  margin: 24px 0 0;
-  font-size: 13px;
-  color: var(--text-faint);
-}
-
 @media (max-width: 860px) {
   .login {
     grid-template-columns: 1fr;
