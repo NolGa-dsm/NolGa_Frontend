@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { API_BASE_URL } from '../api'
+import { signup } from '../api'
 
 interface SignupFormProps {
   onSuccess: () => void
@@ -17,19 +17,18 @@ function SignupForm({ onSuccess }: SignupFormProps) {
       setError('아이디와 비밀번호를 입력해주세요.')
       return
     }
+    if (username.trim().length < 3 || username.trim().length > 64) {
+      setError('아이디는 3~64자여야 합니다.')
+      return
+    }
+    if (password.length < 8 || password.length > 128) {
+      setError('비밀번호는 8~128자여야 합니다.')
+      return
+    }
     setError('')
     setSubmitting(true)
     try {
-      // TODO: 백엔드 스펙에 맞게 엔드포인트/필드명 조정
-      const res = await fetch(`${API_BASE_URL}/api/auth/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username.trim(), password }),
-      })
-      if (!res.ok) {
-        const body = await res.json().catch(() => null)
-        throw new Error(body?.message ?? '회원가입에 실패했습니다.')
-      }
+      await signup(username.trim(), password)
       onSuccess()
     } catch (err) {
       setError(
