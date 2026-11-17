@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { isAbortError } from '../api'
 import { fetchWork, updateWorkSummary, type WorkDetail } from '../works'
 
 export function useWork(id: string | undefined) {
@@ -9,7 +10,9 @@ export function useWork(id: string | undefined) {
     const controller = new AbortController()
     fetchWork(id, controller.signal)
       .then((work) => setState({ id, work }))
-      .catch(() => {})
+      .catch((err) => {
+        if (!isAbortError(err)) setState({ id, work: null })
+      })
     return () => controller.abort()
   }, [id])
 

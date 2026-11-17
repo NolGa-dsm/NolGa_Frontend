@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { API_BASE_URL, saveSession } from '../api'
+import { login, saveSession } from '../api'
 
 function LoginForm() {
   const navigate = useNavigate()
@@ -18,18 +18,8 @@ function LoginForm() {
     setError('')
     setSubmitting(true)
     try {
-      // TODO: 백엔드 스펙에 맞게 엔드포인트/필드명 조정
-      const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username.trim(), password }),
-      })
-      if (!res.ok) {
-        const body = await res.json().catch(() => null)
-        throw new Error(body?.message ?? '아이디 또는 비밀번호가 올바르지 않습니다.')
-      }
-      const { accessToken } = (await res.json()) as { accessToken: string }
-      saveSession(accessToken, username.trim())
+      const { access_token } = await login(username.trim(), password)
+      saveSession(access_token, username.trim())
       navigate('/dashboard')
     } catch (err) {
       setError(

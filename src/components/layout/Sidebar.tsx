@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { clearSession, getUsername } from '../../api'
+import { clearSession, getUsername, logout as logoutApi } from '../../api'
 
 const MENU = [
   { to: '/dashboard', label: '전체 문서' },
@@ -11,7 +11,8 @@ function Sidebar() {
   const navigate = useNavigate()
   const username = getUsername() ?? '사용자'
 
-  const logout = () => {
+  const logout = async () => {
+    await logoutApi()
     clearSession()
     navigate('/login')
   }

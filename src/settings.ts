@@ -5,18 +5,6 @@ export interface TrackedRepository {
   name: string // 예: nolga/api-server
 }
 
-export interface McpClient {
-  name: string // 예: Claude Code, Cursor
-  status: 'connected' | 'error'
-  lastCalledAt: string | null // ISO date-time
-}
-
-export interface McpStatus {
-  status: 'connected' | 'disconnected'
-  checkedAt: string
-  clients: McpClient[]
-}
-
 export interface NotificationSettings {
   documentCreated: boolean
   mcpError: boolean
@@ -56,16 +44,6 @@ export const fetchTrackedRepositories = (signal?: AbortSignal) =>
 
 export const removeRepository = (id: string) =>
   request<void>(`/api/settings/repositories/${id}`, { method: 'DELETE' })
-
-export const fetchMcpStatus = (signal?: AbortSignal) =>
-  request<McpStatus>('/api/settings/mcp', { signal }, {
-    status: 'connected',
-    checkedAt: new Date().toISOString(),
-    clients: [
-      { name: 'Claude Code', status: 'connected', lastCalledAt: '2026-10-08T09:12:00Z' },
-      { name: 'Cursor', status: 'error', lastCalledAt: null },
-    ],
-  })
 
 export const changePassword = (currentPassword: string, newPassword: string) =>
   request<void>('/api/account/password', {
