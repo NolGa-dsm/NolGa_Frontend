@@ -1,3 +1,4 @@
+import { isAbortError } from '../api'
 import { useEffect, useState } from 'react'
 import { fetchMyWorks, type Work } from '../works'
 
@@ -8,7 +9,9 @@ export function useMyWorks() {
     const controller = new AbortController()
     fetchMyWorks(controller.signal)
       .then(setWorks)
-      .catch(() => {})
+      .catch((err) => {
+        if (!isAbortError(err)) setWorks([])
+      })
     return () => controller.abort()
   }, [])
 

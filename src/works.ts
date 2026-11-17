@@ -1,4 +1,4 @@
-import { API_BASE_URL } from './api'
+import { authFetch, readError } from './api'
 
 export type WorkStatus = 'auto' | 'review' | 'edited'
 
@@ -40,157 +40,99 @@ export const STATUS_LABEL: Record<WorkStatus, string> = {
   edited: '수정됨',
 }
 
-// TODO: 백엔드 연동 후 제거 (API 실패 시 화면 확인용 샘플)
-const SAMPLE_WORKS: Work[] = [
-  {
-    id: '1',
-    title: '결제 웹훅 재시도 로직 개선',
-    summary: '실패한 웹훅을 지수 백오프로 최대 6회 재시도하고, 실패 이벤트를 DLQ로 보냅니다.',
-    repository: 'nolga/api-server',
-    author: 'jihoon.kim',
-    createdAt: '2026-08-24',
-    status: 'auto',
-  },
-  {
-    id: '2',
-    title: '문서 요약 프롬프트 v3 적용',
-    summary: '커밋 메시지 위주였던 요약을 diff 컨텍스트 기반으로 교체해 평균 요약 품질을 높입니다.',
-    repository: 'nolga/summarizer',
-    author: 'sena.park',
-    createdAt: '2026-08-23',
-    status: 'review',
-  },
-  {
-    id: '3',
-    title: '사내 SSO 로그인 연동',
-    summary: 'OIDC 기반 사내 계정 로그인 추가 및 기존 username/password 로그인과 계정을 연결합니다.',
-    repository: 'nolga/web',
-    author: 'minu.lee',
-    createdAt: '2026-08-21',
-    status: 'auto',
-  },
-  {
-    id: '4',
-    title: '저장소 인덱싱 파이프라인 분리',
-    summary: '인덱싱 작업을 별도 워커로 분리하고 큐 기반으로 전환, 대형 저장소 초기 인덱싱 시간을 줄입니다.',
-    repository: 'nolga/indexer',
-    author: 'jihoon.kim',
-    createdAt: '2026-08-19',
-    status: 'edited',
-  },
-  {
-    id: '5',
-    title: '문서 검색 필터 API',
-    summary: '제목/repository/작성자 기준 복합 필터와 커서 페이지네이션을 지원합니다.',
-    repository: 'nolga/api-server',
-    author: 'hana.jung',
-    createdAt: '2026-08-18',
-    status: 'auto',
-  },
-  {
-    id: '6',
-    title: '이슈 트래커 링크 자동 매칭',
-    summary: '브랜치명과 커밋 메시지에서 이슈 키를 추출해 관련 이슈 섹션을 자동으로 추가합니다.',
-    repository: 'nolga/summarizer',
-    author: 'sena.park',
-    createdAt: '2026-08-17',
-    status: 'auto',
-  },
-]
+export interface WorkFilters {
+  page?: number
+  size?: number
+  repository?: string
+  q?: string
+  status?: WorkStatus
+  author?: string
+  created_from?: string // YYYY-MM-DD
+  created_to?: string
+}
 
-// TODO: 백엔드 응답 스펙에 맞게 엔드포인트/필드명 조정
-export async function fetchWorks(signal?: AbortSignal): Promise<Work[]> {
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/works`, {
-      signal,
-      headers: { Authorization: `Bearer ${localStorage.getItem('accessToken') ?? ''}` },
-    })
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    return (await res.json()) as Work[]
-  } catch (err) {
-    if (err instanceof DOMException && err.name === 'AbortError') throw err
-    return SAMPLE_WORKS
+type Raw = Record<string, unknown>
+
+const str = (v: unknown, fallback = '') => (typeof v === 'string' ? v : fallback)
+
+// 목록 응답(WorkResponse)을 화면 모델로 변환한다. summary/repository는 null일 수 있다.
+function toWork(r: Raw): Work {
+  return {
+    id: String(r.id),
+    title: str(r.title),
+    summary: str(r.summary),
+    repository: str(r.repository),
+    author: str(r.author),
+    createdAt: str(r.createdAt ?? r.created_at),
+    status: (r.status as WorkStatus) ?? 'auto',
   }
 }
 
-// TODO: 백엔드 응답 스펙에 맞게 엔드포인트/필드명 조정 (내가 작성한 작업만 반환)
+async function request(path: string, init?: RequestInit): Promise<Response> {
+  const res = await authFetch(path, init)
+  if (!res.ok && res.status !== 404) throw new Error(await readError(res, `HTTP ${res.status}`))
+  return res
+}
+
+export async function fetchWorks(
+  signal?: AbortSignal,
+  filters: WorkFilters = { size: 100 },
+): Promise<Work[]> {
+  const params = new URLSearchParams()
+  for (const [k, v] of Object.entries(filters)) {
+    if (v !== undefined && v !== '') params.set(k, String(v))
+  }
+  const qs = params.toString()
+  const res = await request(`/api/works${qs ? `?${qs}` : ''}`, { signal })
+  return ((await res.json()) as Raw[]).map(toWork)
+}
+
+// 내가 작성한 작업만 반환
 export async function fetchMyWorks(signal?: AbortSignal): Promise<Work[]> {
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/works/me`, {
-      signal,
-      headers: { Authorization: `Bearer ${localStorage.getItem('accessToken') ?? ''}` },
-    })
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    return (await res.json()) as Work[]
-  } catch (err) {
-    if (err instanceof DOMException && err.name === 'AbortError') throw err
-    const username = localStorage.getItem('username')
-    return SAMPLE_WORKS.filter((w) => w.author === username)
+  const res = await request('/api/works/me', { signal })
+  return ((await res.json()) as Raw[]).map(toWork)
+}
+
+// WorkDetailResponse 스키마가 명세에 없어 필드명을 방어적으로 해석한다.
+// sources 중 type이 issue인 항목은 관련 이슈로 표시한다.
+function toDetail(r: Raw): WorkDetail {
+  const changes = Array.isArray(r.changes) ? (r.changes as Raw[]) : []
+  const sources = Array.isArray(r.sources) ? (r.sources as Raw[]) : []
+  return {
+    ...toWork(r),
+    branch: str(r.branch) || undefined,
+    request: str(r.request) || undefined,
+    styleName: str(r.styleName ?? r.style_name) || undefined,
+    changes: changes.map((c) => ({
+      path: str(c.path),
+      type: (c.type as ChangedFile['type']) ?? 'modified',
+      additions: Number(c.additions ?? 0),
+      deletions: Number(c.deletions ?? 0),
+    })),
+    issues: sources
+      .filter((s) => s.type === 'issue')
+      .map((s) => ({ key: str(s.title), url: str(s.url) || undefined })),
   }
 }
 
-// TODO: 백엔드 연동 후 제거 (API 실패 시 화면 확인용 샘플)
-const SAMPLE_DETAILS: Record<string, Partial<WorkDetail>> = {
-  '1': {
-    branch: 'feature/webhook-retry',
-    request: '결제 웹훅 재시도 로직 바꾼 거 문서화해줘. 일감 API-142 참고해줘.',
-    styleName: '팀 기본 스타일',
-    changes: [
-      { path: 'src/webhook/retry.ts', type: 'modified', additions: 64, deletions: 12 },
-      { path: 'src/webhook/dlq.ts', type: 'added', additions: 38, deletions: 0 },
-      { path: 'src/webhook/legacyRetry.ts', type: 'deleted', additions: 0, deletions: 51 },
-    ],
-    issues: [
-      { key: 'API-142', title: '웹훅 실패 시 이벤트 유실 문제', url: 'https://tracker.example.com/API-142' },
-      { key: 'API-150' },
-    ],
-  },
-}
-
-// TODO: 백엔드 응답 스펙에 맞게 엔드포인트/필드명 조정
 export async function fetchWork(id: string, signal?: AbortSignal): Promise<WorkDetail | null> {
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/works/${encodeURIComponent(id)}`, {
-      signal,
-      headers: { Authorization: `Bearer ${localStorage.getItem('accessToken') ?? ''}` },
-    })
-    if (res.status === 404) return null
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    return (await res.json()) as WorkDetail
-  } catch (err) {
-    if (err instanceof DOMException && err.name === 'AbortError') throw err
-    const base = SAMPLE_WORKS.find((w) => w.id === id)
-    if (!base) return null
-    return { ...base, changes: [], issues: [], ...SAMPLE_DETAILS[id] }
-  }
+  const res = await request(`/api/works/${encodeURIComponent(id)}`, { signal })
+  if (res.status === 404) return null
+  return toDetail((await res.json()) as Raw)
 }
 
-// TODO: 백엔드 응답 스펙에 맞게 엔드포인트/필드명 조정 (실패해도 화면에는 수정 반영)
+// 요약 수정 시 서버가 status를 edited로 바꾼다.
 export async function updateWorkSummary(id: string, summary: string): Promise<void> {
-  try {
-    await fetch(`${API_BASE_URL}/api/works/${encodeURIComponent(id)}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('accessToken') ?? ''}`,
-      },
-      body: JSON.stringify({ summary }),
-    })
-  } catch {
-    // 연동 전에는 무시
-  }
+  await request(`/api/works/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ summary }),
+  })
 }
 
-// TODO: 백엔드 응답 스펙에 맞게 엔드포인트 조정 (실패해도 화면에서는 제거)
+// 작업 삭제 API는 아직 명세에 없다. 백엔드에 추가되면 DELETE /api/works/{id}로 연동한다.
 export async function deleteWork(id: string): Promise<void> {
-  try {
-    await fetch(`${API_BASE_URL}/api/works/${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${localStorage.getItem('accessToken') ?? ''}` },
-    })
-  } catch {
-    // 연동 전에는 무시
-  }
+  await request(`/api/works/${encodeURIComponent(id)}`, { method: 'DELETE' })
 }
 
 export function matchesQuery(work: Work, query: string): boolean {
