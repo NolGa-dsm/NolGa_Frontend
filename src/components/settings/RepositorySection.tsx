@@ -4,6 +4,7 @@ import {
   removeRepository,
   type TrackedRepository,
 } from '../../settings'
+import { isAbortError } from '../../api'
 import { errorMessage } from './errorMessage'
 
 function RepositorySection() {
@@ -12,7 +13,14 @@ function RepositorySection() {
 
   useEffect(() => {
     const controller = new AbortController()
-    fetchTrackedRepositories(controller.signal).then(setRepos).catch(() => {})
+    fetchTrackedRepositories(controller.signal)
+      .then(setRepos)
+      .catch((err) => {
+        if (!isAbortError(err)) {
+          setRepos([])
+          setError(errorMessage(err))
+        }
+      })
     return () => controller.abort()
   }, [])
 

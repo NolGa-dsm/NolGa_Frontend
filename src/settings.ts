@@ -1,4 +1,4 @@
-import { authFetch, isAbortError } from './api'
+import { authFetch } from './api'
 
 export interface TrackedRepository {
   id: string
@@ -16,31 +16,21 @@ export interface IlgamSettings {
   connected: boolean
 }
 
-async function request<T>(path: string, init: RequestInit = {}, fallback?: T): Promise<T> {
-  try {
-    const res = await authFetch(path, {
-      ...init,
-      headers: { 'Content-Type': 'application/json', ...init.headers },
-    })
-    if (!res.ok) {
-      const body = await res.json().catch(() => null)
-      throw new Error(body?.message ?? `HTTP ${res.status}`)
-    }
-    return (res.status === 204 ? undefined : await res.json()) as T
-  } catch (err) {
-    if (isAbortError(err)) throw err
-    if (fallback !== undefined) return fallback
-    throw err
+async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const res = await authFetch(path, {
+    ...init,
+    headers: { 'Content-Type': 'application/json', ...init.headers },
+  })
+  if (!res.ok) {
+    const body = await res.json().catch(() => null)
+    throw new Error(body?.message ?? `HTTP ${res.status}`)
   }
+  return (res.status === 204 ? undefined : await res.json()) as T
 }
 
 // 저장소/일감 연동의 등록은 MCP가 담당하고, 웹에서는 조회·수정·삭제만 한다.
-// TODO: 백엔드 연동 후 fallback(샘플) 제거, 엔드포인트/필드명 조정
 export const fetchTrackedRepositories = (signal?: AbortSignal) =>
-  request<TrackedRepository[]>('/api/settings/repositories', { signal }, [
-    { id: '1', name: 'nolga/api-server' },
-    { id: '2', name: 'nolga/web' },
-  ])
+  request<TrackedRepository[]>('/api/settings/repositories', { signal })
 
 export const removeRepository = (id: string) =>
   request<void>(`/api/settings/repositories/${id}`, { method: 'DELETE' })
@@ -52,11 +42,7 @@ export const changePassword = (currentPassword: string, newPassword: string) =>
   })
 
 export const fetchNotifications = (signal?: AbortSignal) =>
-  request<NotificationSettings>('/api/settings/notifications', { signal }, {
-    documentCreated: true,
-    mcpError: true,
-    weeklyDigest: false,
-  })
+  request<NotificationSettings>('/api/settings/notifications', { signal })
 
 export const saveNotifications = (value: NotificationSettings) =>
   request<NotificationSettings>('/api/settings/notifications', {
@@ -65,10 +51,7 @@ export const saveNotifications = (value: NotificationSettings) =>
   })
 
 export const fetchIlgam = (signal?: AbortSignal) =>
-  request<IlgamSettings>('/api/settings/integrations/ilgam', { signal }, {
-    url: '',
-    connected: false,
-  })
+  request<IlgamSettings>('/api/settings/integrations/ilgam', { signal })
 
 export const saveIlgam = (url: string, apiKey: string) =>
   request<IlgamSettings>('/api/settings/integrations/ilgam', {

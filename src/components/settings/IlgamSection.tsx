@@ -5,6 +5,7 @@ import {
   saveIlgam,
   type IlgamSettings,
 } from '../../settings'
+import { isAbortError } from '../../api'
 import { errorMessage } from './errorMessage'
 
 function IlgamSection() {
@@ -20,7 +21,9 @@ function IlgamSection() {
         setInfo(v)
         setUrl(v.url)
       })
-      .catch(() => {})
+      .catch((err) => {
+        if (!isAbortError(err)) setMsg({ type: 'error', text: errorMessage(err) })
+      })
     return () => controller.abort()
   }, [])
 
@@ -60,7 +63,7 @@ function IlgamSection() {
       </h2>
       <p className="card__desc">연동은 MCP에서 진행하며, 웹에서는 연동 정보를 수정하거나 해제합니다.</p>
       {info === null ? (
-        <p className="muted">불러오는 중...</p>
+        msg?.type === 'error' ? null : <p className="muted">불러오는 중...</p>
       ) : !info.connected ? (
         <p className="muted">연동된 일감 사이트가 없습니다. MCP에서 연동하면 여기에 표시됩니다.</p>
       ) : (

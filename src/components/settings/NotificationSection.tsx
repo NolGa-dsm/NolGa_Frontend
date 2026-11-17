@@ -4,6 +4,7 @@ import {
   saveNotifications,
   type NotificationSettings,
 } from '../../settings'
+import { isAbortError } from '../../api'
 import { errorMessage } from './errorMessage'
 
 const NOTIFICATION_LABELS: Record<keyof NotificationSettings, string> = {
@@ -18,7 +19,11 @@ function NotificationSection() {
 
   useEffect(() => {
     const controller = new AbortController()
-    fetchNotifications(controller.signal).then(setValue).catch(() => {})
+    fetchNotifications(controller.signal)
+      .then(setValue)
+      .catch((err) => {
+        if (!isAbortError(err)) setError(errorMessage(err))
+      })
     return () => controller.abort()
   }, [])
 
@@ -41,7 +46,7 @@ function NotificationSection() {
       <h2 id="s-noti" className="card__title">알림</h2>
       <p className="card__desc">받고 싶은 알림만 켜두세요.</p>
       {value === null ? (
-        <p className="muted">불러오는 중...</p>
+        error ? null : <p className="muted">불러오는 중...</p>
       ) : (
         <ul className="list">
           {(Object.keys(NOTIFICATION_LABELS) as (keyof NotificationSettings)[]).map((key) => (
