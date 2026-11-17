@@ -55,7 +55,7 @@ function WorkDetailPage() {
           {work.request && (
             <blockquote className="detail__request">
               <span className="detail__label">요청 내용</span>
-              {work.request}
+              <div className="detail__md"><ReactMarkdown>{work.request}</ReactMarkdown></div>
             </blockquote>
           )}
 
