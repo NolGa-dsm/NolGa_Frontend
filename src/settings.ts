@@ -1,10 +1,5 @@
 import { authFetch } from './api'
 
-export interface TrackedRepository {
-  id: string
-  name: string // 예: nolga/api-server
-}
-
 export interface NotificationSettings {
   documentCreated: boolean
   mcpError: boolean
@@ -28,13 +23,6 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   return (res.status === 204 ? undefined : await res.json()) as T
 }
 
-// 저장소/일감 연동의 등록은 MCP가 담당하고, 웹에서는 조회·수정·삭제만 한다.
-export const fetchTrackedRepositories = (signal?: AbortSignal) =>
-  request<TrackedRepository[]>('/api/settings/repositories', { signal })
-
-export const removeRepository = (id: string) =>
-  request<void>(`/api/settings/repositories/${id}`, { method: 'DELETE' })
-
 export const changePassword = (currentPassword: string, newPassword: string) =>
   request<void>('/api/account/password', {
     method: 'PUT',
@@ -50,6 +38,7 @@ export const saveNotifications = (value: NotificationSettings) =>
     body: JSON.stringify(value),
   })
 
+// 일감 연동의 등록은 MCP가 담당하고, 웹에서는 조회·수정·삭제만 한다.
 export const fetchIlgam = (signal?: AbortSignal) =>
   request<IlgamSettings>('/api/settings/integrations/ilgam', { signal })
 
