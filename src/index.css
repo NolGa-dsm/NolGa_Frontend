@@ -1,25 +1,56 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
 
 :root {
-  /* palette: F1EFEC D4C9BE 123458 030303 */
-  --bg: #030303;
-  --surface: color-mix(in srgb, #123458 28%, #030303);
-  --surface-2: color-mix(in srgb, #123458 55%, #030303);
-  --border: #123458;
-  --text: #f1efec;
-  --text-muted: #d4c9be;
-  --text-faint: color-mix(in srgb, #d4c9be 60%, #030303);
-  --primary: #d4c9be;
-  --primary-hover: #f1efec;
-  --primary-ink: #030303;
-  --primary-rgb: 212, 201, 190;
-  --focus-ring: rgba(212, 201, 190, 0.35);
-  --error: #ff6b6b;
+  /* palette: neutral (black/gray/white) + accent #00498c */
+  --bg: #ffffff;
+  --surface: #f5f5f6;
+  --surface-2: #e9e9ec;
+  --border: #d4d4d8;
+  --text: #111113;
+  --text-muted: #52525b;
+  --text-faint: #71717a;
+  --accent: #00498c;
+  --accent-ink: #ffffff;
+  --primary: #00498c;
+  --primary-hover: #003a72;
+  --primary-ink: #ffffff;
+  --primary-rgb: 0, 73, 140;
+  --focus-ring: rgba(0, 73, 140, 0.3);
+  --success: #1b7f4b;
+  --success-rgb: 27, 127, 75;
+  --warning: #b45309;
+  --warning-rgb: 180, 83, 9;
+  --error: #c62828;
+  --error-rgb: 198, 40, 40;
 
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI',
     sans-serif;
   color: var(--text);
   background: var(--bg);
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --bg: #0a0a0b;
+  --surface: #141415;
+  --surface-2: #202023;
+  --border: #303034;
+  --text: #f4f4f5;
+  --text-muted: #a1a1aa;
+  --text-faint: #8a8a94;
+  --accent: #00498c;
+  --accent-ink: #ffffff;
+  --primary: #5a9ad8;
+  --primary-hover: #82b4e6;
+  --primary-ink: #07101a;
+  --primary-rgb: 90, 154, 216;
+  --focus-ring: rgba(90, 154, 216, 0.4);
+  --success: #34d399;
+  --success-rgb: 52, 211, 153;
+  --warning: #fbbf24;
+  --warning-rgb: 251, 191, 36;
+  --error: #f87171;
+  --error-rgb: 248, 113, 113;
   color-scheme: dark;
 }
 

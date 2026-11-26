@@ -1,0 +1,14 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/auth/:path*", "destination": "https://nolga-backend-develop.onrender.com/auth/:path*" },
+    { "source": "/api/:path*", "destination": "https://nolga-backend-develop.onrender.com/api/:path*" },
+    { "source": "/api-keys/:path+", "destination": "https://nolga-backend-develop.onrender.com/api-keys/:path+" },
+    { "source": "/api-keys", "destination": "https://nolga-backend-develop.onrender.com/api-keys" },
+    { "source": "/health", "destination": "https://nolga-backend-develop.onrender.com/health" },
+    { "source": "/((?!assets/).*)", "destination": "/index.html" }
+  ]
+}
